@@ -8,7 +8,7 @@
 import SwiftUI
 import Combine
 
-struct ContentView: View {
+struct LoginView: View {
     @State private var login = ""
     @State private var password = ""
     @State private var shouldShowLogo: Bool = true
@@ -75,7 +75,7 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        LoginView()
     }
 }
 
