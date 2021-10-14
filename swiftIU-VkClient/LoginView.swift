@@ -11,7 +11,9 @@ import Combine
 struct LoginView: View {
     @State private var login = ""
     @State private var password = ""
+    @State private var shouldShowMainView: Bool = false
     @State private var shouldShowLogo: Bool = true
+    @State private var showIncorrentCredentialsWarning = false
     private let keyboardIsOnPublisher = Publishers.Merge(
         NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)
             .map { _ in true },
@@ -19,6 +21,20 @@ struct LoginView: View {
             .map { _ in false }
     )
     .removeDuplicates()
+    
+    @Binding var isUserLoggedIn: Bool
+    
+    let loginService = LoginService()
+    
+    private func verifyLoginData() {
+        if loginService.checkUserData(login: login, password: password) {
+            isUserLoggedIn = true
+        } else {
+            showIncorrentCredentialsWarning = true
+        }
+        
+        password = ""
+    }
     
     var body: some View {
         ZStack {
@@ -53,7 +69,7 @@ struct LoginView: View {
                         }
                     }.frame(maxWidth: 250)
                     .padding(.top, 50)
-                    Button(action: { print("Hello") }) {
+                    Button(action: verifyLoginData) {
                         Text("Log in")
                     }.padding(.top, 50)
                     .padding(.bottom, 20)
@@ -67,15 +83,17 @@ struct LoginView: View {
             }
         }.onTapGesture {
             UIApplication.shared.endEditing()
+        }.alert(isPresented: $showIncorrentCredentialsWarning, content: { Alert(title: Text("Error"), message: Text("Incorrent Login/Password was entered"))
+        })
         }
     }
-}
 
 
 
-struct ContentView_Previews: PreviewProvider {
+
+struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
-        LoginView()
+        LoginView(isUserLoggedIn: .constant(false))
     }
 }
 
